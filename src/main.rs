@@ -1,14 +1,17 @@
+mod routes;
+mod feishu;
+mod grafana;
+
 use warp::Filter;
+
+use crate::routes::grafana_alerts;
 
 #[tokio::main]
 async fn main() {
-    // GET /hello/warp => 200 OK with body "Hello, warp!"
-    let hello = warp::path!("hello" / String)
-        .map(|name| format!("Hello, {}!", name));
-
     let health = warp::path!("health").map(|| "OK");
 
-    let routes = hello.or(health);
+    let routes = health
+        .or(grafana_alerts());
 
     warp::serve(routes)
         .run(([127, 0, 0, 1], 3030))
