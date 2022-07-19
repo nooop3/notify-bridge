@@ -1,9 +1,10 @@
 use std::str::FromStr;
+use std::string::ToString;
 
-use serde::Deserialize;
-use strum::EnumString;
+use serde::{Deserialize, Serialize};
+use strum::{Display, EnumString};
 
-#[derive(Debug, PartialEq, Eq, EnumString)]
+#[derive(Display, Debug, PartialEq, Eq, EnumString)]
 #[strum(serialize_all = "snake_case")]
 pub enum AlertDestination {
     Grafana,
@@ -19,6 +20,18 @@ pub struct ApiKeyParams {
 pub struct AlertKeyMap {
     pub alert_destination: AlertDestination,
     pub key: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct AlertResonse {
+    pub status: String,
+    pub destination: String,
+}
+
+#[derive(Serialize)]
+pub struct Response {
+    pub status: String,
+    pub items: Vec<AlertResonse>,
 }
 
 pub fn parse_str(s: &str) -> Vec<AlertKeyMap> {

@@ -1,11 +1,7 @@
-use warp::{
-    http::HeaderValue,
-    hyper::{header, Body, Response},
-    Filter, Rejection, Reply,
-};
+use warp::{Filter, Rejection, Reply};
 
 use crate::{
-    common::{parse_str, AlertDestination, ApiKeyParams},
+    common::{parse_str, AlertDestination, AlertResonse, ApiKeyParams, Response},
     grafana::GrafanaAlert,
 };
 
@@ -19,7 +15,8 @@ pub fn grafana_alerts() -> impl Filter<Extract = impl Reply, Error = Rejection> 
         .and(warp::path!("api" / "v1" / "grafana" / "alerts"))
         .and(warp::query::<ApiKeyParams>())
         .and(warp::body::json())
-        .map(|query: ApiKeyParams, mut _alert: GrafanaAlert| {
+        .map(|query: ApiKeyParams, _alert: GrafanaAlert| {
+            let mut items = Vec::new();
             let api_keys = parse_str(&query.api_key);
             for api_key in api_keys {
                 println!(
@@ -29,11 +26,16 @@ pub fn grafana_alerts() -> impl Filter<Extract = impl Reply, Error = Rejection> 
                 if api_key.alert_destination == AlertDestination::Feishu {
                     println!("{}", api_key.key);
                 }
+
+                items.push(AlertResonse {
+                    status: "success".to_string(),
+                    destination: api_key.alert_destination.to_string(),
+                });
             }
 
-            let mut resp = Response::new(Body::from({}));
-            resp.headers_mut()
-                .insert(header::CONTENT_TYPE, HeaderValue::from_static("text/plain"));
-            resp
+            warp::reply::json(&(Response {
+                status: "success".to_string(),
+                items,
+            }))
         })
 }
