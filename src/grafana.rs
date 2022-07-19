@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /*
 {
@@ -31,7 +31,7 @@ use serde::{Serialize, Deserialize};
 struct EvalMatches {
     value: i32,
     metric: String,
-    tags: HashMap<String, String>
+    tags: HashMap<String, String>,
 }
 
 #[derive(Serialize, Deserialize)]
