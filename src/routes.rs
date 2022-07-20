@@ -1,7 +1,7 @@
 use warp::{Filter, Rejection, Reply};
 
 use crate::{
-    common::{parse_str, AlertDestination, AlertResonse, ApiKeyParams, Response},
+    common::{check_api_key, AlertDestination, AlertKeyMap, AlertResonse, Response},
     grafana::GrafanaAlert,
 };
 
@@ -11,11 +11,10 @@ pub fn grafana_alerts() -> impl Filter<Extract = impl Reply, Error = Rejection> 
 
     warp::post()
         .and(warp::path!("api" / "v1" / "grafana" / "alerts"))
-        .and(warp::query::<ApiKeyParams>())
+        .and(check_api_key())
         .and(warp::body::json())
-        .map(|query: ApiKeyParams, _alert: GrafanaAlert| {
+        .map(|api_keys: Vec<AlertKeyMap>, _body: GrafanaAlert| {
             let mut items = Vec::new();
-            let api_keys = parse_str(&query.api_key);
             for api_key in api_keys {
                 info!(
                     "Destination: {:?}, key: {}",
@@ -38,4 +37,5 @@ pub fn grafana_alerts() -> impl Filter<Extract = impl Reply, Error = Rejection> 
                 }),
             )
         })
+        .boxed()
 }
