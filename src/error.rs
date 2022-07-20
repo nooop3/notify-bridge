@@ -17,19 +17,25 @@ pub async fn handle_rejection(err: warp::Rejection) -> Result<impl warp::Reply, 
     let code;
     let message;
 
-    if let Some(_e) = err.find::<ConversionError>() {
+    if err.find::<ConversionError>().is_some()
+        || err.find::<warp::reject::InvalidQuery>().is_some()
+        || err.find::<warp::reject::InvalidHeader>().is_some()
+    {
         code = StatusCode::BAD_REQUEST;
-        message = "Bad Request".to_string();
+        message = "Bad Request";
+    } else if err.find::<warp::reject::MethodNotAllowed>().is_some() {
+        code = StatusCode::METHOD_NOT_ALLOWED;
+        message = "Method Not Allowed";
     } else {
         // We should have expected this... Just log and say its a 500
         eprintln!("unhandled rejection: {:?}", err);
         code = StatusCode::INTERNAL_SERVER_ERROR;
-        message = "UNHANDLED_REJECTION".to_string();
+        message = "UNHANDLED_REJECTION";
     }
 
     let json = warp::reply::json(&ErrorMessage {
         code: code.as_u16(),
-        message,
+        message: message.into(),
         data: json!(null),
     });
 
