@@ -2,8 +2,9 @@ use warp::{filters::BoxedFilter, hyper::StatusCode, Filter, Rejection, Reply};
 
 use crate::{
     common::{check_api_key, AlertDestinations, AlertKeyMap, AlertResponse, Response},
+    error::FeishuFailedRequestError,
     feishu::post_feishu_alert,
-    grafana::GrafanaAlert, error::ConversionError,
+    grafana::GrafanaAlert,
 };
 
 pub async fn handle_request(
@@ -25,8 +26,10 @@ pub async fn handle_request(
                         result: response,
                     });
                 }
-                Err(_) => {
-                    return Err(warp::reject::custom(ConversionError));
+                Err(err) => {
+                    return Err(warp::reject::custom(FeishuFailedRequestError {
+                        message: err.to_string(),
+                    }));
                 }
             }
         }

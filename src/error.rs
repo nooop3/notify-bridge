@@ -13,6 +13,12 @@ struct ErrorMessage {
 pub struct ConversionError;
 impl Reject for ConversionError {}
 
+#[derive(Debug)]
+pub struct FeishuFailedRequestError {
+    pub message: String,
+}
+impl Reject for FeishuFailedRequestError {}
+
 pub async fn handle_rejection(err: warp::Rejection) -> Result<impl warp::Reply, warp::Rejection> {
     let code;
     let message;
@@ -23,6 +29,9 @@ pub async fn handle_rejection(err: warp::Rejection) -> Result<impl warp::Reply, 
     {
         code = StatusCode::BAD_REQUEST;
         message = "Bad Request";
+    } else if let Some(e) = err.find::<FeishuFailedRequestError>() {
+        code = StatusCode::BAD_REQUEST;
+        message = &e.message;
     } else if err.find::<warp::reject::MethodNotAllowed>().is_some() {
         code = StatusCode::METHOD_NOT_ALLOWED;
         message = "Method Not Allowed";

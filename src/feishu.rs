@@ -6,7 +6,7 @@
 use crate::common::{AlertStatus, FeishuAPIResponse};
 use reqwest::{header, Client};
 
-const FEISHU_OPEN_API_PREFIX: &str = "https://open.feishu.cn/pen-apis/bot/v2/hook/";
+const FEISHU_OPEN_API_PREFIX: &str = "https://open.feishu.cn/open-apis/bot/v2/hook/";
 
 pub async fn post_feishu_alert(
     api_key: String,
@@ -37,9 +37,9 @@ pub async fn post_feishu_alert(
             };
             Ok((status, response))
         }
-        _ => Err(Box::new(std::io::Error::new(
+        status_code => Err(Box::new(std::io::Error::new(
             std::io::ErrorKind::Other,
-            "Failed to send Feishu API request",
+            format!("Failed to send Feishu API request, status: {}", status_code),
         ))),
     }
 }
