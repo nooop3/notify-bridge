@@ -6,7 +6,7 @@
 use crate::common::{AlertStatus, FeishuAPIResponse};
 use reqwest::{header, Client};
 
-const FEISHU_OPEN_API_PREFIX: &str = "https://open.feishu.cn/open-apis/bot/v2/hook/";
+const FEISHU_OPEN_API_PREFIX: &str = "https://open.feishu.cn/pen-apis/bot/v2/hook/";
 
 pub async fn post_feishu_alert(
     api_key: String,
@@ -18,7 +18,7 @@ pub async fn post_feishu_alert(
     );
 
     let mut body = String::new();
-    body.push_str("{\"msg_type\":\"text\",\"content\":{\"tex\":\"request example\"}}");
+    body.push_str("{\"msg_type\":\"text\",\"content\":{\"text\":\"request example\"}}");
 
     let client = Client::new();
     let response = client
