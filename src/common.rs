@@ -26,17 +26,56 @@ pub struct AlertKeyMap {
     pub key: String,
 }
 
+// {
+// 	"Extra": null,
+// 	"StatusCode": 0,
+// 	"StatusMessage": "success"
+// }
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct FeishuAPISuccessResponse {
+    pub extra: Option<String>,
+    pub status_code: u16,
+    pub status_message: String,
+}
+// {
+// 	"code": 9499,
+// 	"msg": "Bad Request",
+// 	"data": {}
+// }
+#[derive(Debug, Deserialize, Serialize)]
+pub struct FeishuAPIErrorResponse {
+    pub code: u16,
+    pub msg: String,
+    pub data: serde_json::Value,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum AlertStatus {
+    Success,
+    Failed,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum FeishuAPIResponse {
+    FeishuAPISuccessResponse(FeishuAPISuccessResponse),
+    FeishuAPIErrorResponse(FeishuAPIErrorResponse),
+}
+
 #[derive(Debug, Serialize)]
-pub struct AlertResonse {
+pub struct AlertResponse {
     pub destination: String,
-    pub status: String,
+    pub status: AlertStatus,
+    pub result: FeishuAPIResponse,
 }
 
 #[derive(Serialize)]
 pub struct Response {
     pub code: u16,
     pub message: String,
-    pub data: Vec<AlertResonse>,
+    pub data: Vec<AlertResponse>,
 }
 
 pub fn check_api_key() -> impl Filter<Extract = (Vec<AlertKeyMap>,), Error = Rejection> + Copy {
