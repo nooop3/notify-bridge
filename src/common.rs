@@ -133,18 +133,38 @@ pub struct FeishuAlertMessageTitle {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum TemplateColor {
+    Green,
+    #[serde(alias = "green")]
+    Success,
+    #[serde(alias = "green")]
+    Completed,
+
+    Orange,
+    #[serde(alias = "orange")]
+    Warning,
+    #[serde(alias = "orange")]
+    Notify,
+
+    Red,
+    #[serde(alias = "red")]
+    Error,
+    #[serde(alias = "red")]
+    Failed,
+
+    Grey,
+    #[serde(alias = "grey")]
+    Disabled,
+    #[serde(alias = "grey")]
+    Invalid,
+
     Blue,
     Wathet,
     Turquoise,
-    Green,
     Yellow,
-    Orange,
-    Red,
     Carmine,
     Violet,
     Purple,
     Indigo,
-    Grey,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
