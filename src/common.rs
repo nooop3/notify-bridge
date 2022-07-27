@@ -27,6 +27,158 @@ pub struct AlertKeyMap {
 }
 
 // {
+//   "config": {
+//     "wide_screen_mode": true
+//   },
+//   "header": {
+//     "title": {
+//       "tag": "plain_text",
+//       "content": "你有一个休假申请待审批"
+//     }
+//   },
+//   "elements": [
+//     {
+//       "tag": "div",
+//       "fields": [
+//         {
+//           "is_short": true,
+//           "text": {
+//             "tag": "lark_md",
+//             "content": "**申请人**\n王晓磊"
+//           }
+//         },
+//         {
+//           "is_short": true,
+//           "text": {
+//             "tag": "lark_md",
+//             "content": "**休假类型：**\n年假"
+//           }
+//         },
+//         {
+//           "is_short": false,
+//           "text": {
+//             "tag": "lark_md",
+//             "content": ""
+//           }
+//         },
+//         {
+//           "is_short": false,
+//           "text": {
+//             "tag": "lark_md",
+//             "content": "**时间：**\n2020-4-8 至 2020-4-10（共3天）"
+//           }
+//         },
+//         {
+//           "is_short": false,
+//           "text": {
+//             "tag": "lark_md",
+//             "content": ""
+//           }
+//         },
+//         {
+//           "is_short": true,
+//           "text": {
+//             "tag": "lark_md",
+//             "content": "**备注**\n因家中有急事，需往返老家，故请假"
+//           }
+//         }
+//       ]
+//     },
+//     {
+//       "tag": "note",
+//       "elements": [
+//         {
+//           "tag": "img",
+//           "img_key": "img_b79d3e29-5ffe-4897-822a-9743fe9f7b1g",
+//           "alt": {
+//             "tag": "plain_text",
+//             "content": "图片"
+//           }
+//         },
+//         {
+//           "tag": "plain_text",
+//           "content": "已同意休假申请"
+//         }
+//       ]
+//     }
+//   ]
+// }
+
+const fn default_true() -> bool {
+    true
+}
+fn plain_text_string() -> String {
+    "plain_text".to_string()
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageConfig {
+    #[serde(default = "default_true")]
+    pub enable_forward: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct StringI18n {
+    pub en_us: String,
+    pub zh_cn: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageTitle {
+    #[serde(default = "plain_text_string")]
+    pub tag: String,
+    pub i18n: StringI18n,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum TemplateColor {
+    Blue,
+    Wathet,
+    Turquoise,
+    Green,
+    Yellow,
+    Orange,
+    Red,
+    Carmine,
+    Violet,
+    Purple,
+    Indigo,
+    Grey,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageHeader {
+    pub title: FeishuAlertMessageTitle,
+    pub template: TemplateColor,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageText {
+    pub tag: String,
+    pub content: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageField {
+    pub is_short: bool,
+    pub text: FeishuAlertMessageText,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageElement {
+    pub tag: String,
+    pub fields: Vec<FeishuAlertMessageField>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessage {
+    pub config: FeishuAlertMessageConfig,
+    pub header: FeishuAlertMessageHeader,
+    pub elements: Vec<FeishuAlertMessageElement>,
+}
+
+// {
 // 	"Extra": null,
 // 	"StatusCode": 0,
 // 	"StatusMessage": "success"
