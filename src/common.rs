@@ -2,6 +2,7 @@ use std::str::FromStr;
 use std::string::ToString;
 
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use strum::{Display, EnumString};
 use warp::{Filter, Rejection};
 
@@ -107,8 +108,17 @@ pub struct AlertKeyMap {
 const fn default_true() -> bool {
     true
 }
+const fn default_false() -> bool {
+    false
+}
 fn plain_text_string() -> String {
     "plain_text".to_string()
+}
+fn img_string() -> String {
+    "img".to_string()
+}
+fn button_string() -> String {
+    "button".to_string()
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -174,9 +184,48 @@ pub struct FeishuAlertMessageHeader {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageElementDivTag;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageElementLarkMdTag;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageElementHrTag;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageElementImgTag;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageElementNoteTag;
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum FeishuAlertMessageElementTag {
+    Div(FeishuAlertMessageElementDivTag),
+    Markdown(FeishuAlertMessageElementLarkMdTag),
+    Hr(FeishuAlertMessageElementHrTag),
+    Img(FeishuAlertMessageElementImgTag),
+    Note(FeishuAlertMessageElementNoteTag),
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageElement2 {
+    pub tag: FeishuAlertMessageElementTag,
+    pub fields: Vec<FeishuAlertMessageField>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum FeishuAlertMessageTextTag {
+    PlainText,
+    LarkMd,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct FeishuAlertMessageText {
-    pub tag: String,
-    pub content: String,
+    tag: FeishuAlertMessageTextTag,
+    content: String,
+    lines: Option<i32>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -186,16 +235,131 @@ pub struct FeishuAlertMessageField {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct FeishuAlertMessageElement {
+#[serde(rename_all = "snake_case")]
+pub enum FeishuAlertMessageImgMode {
+    FitHorizontal,
+    CropCenter,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageImg {
+    #[serde(default = "img_string")]
+    tag: String,
+    img_key: String,
+    alt: FeishuAlertMessageText,
+    title: Option<FeishuAlertMessageText>,
+    custom_width: Option<i32>,
+    #[serde(default = "default_false")]
+    compact_width: bool,
+    mode: Option<FeishuAlertMessageImgMode>,
+    preview: Option<bool>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageMultiUrl {
+    pub url: String,
+    pub andriod_url: String,
+    pub ios_url: String,
+    pub pc_url: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FeishuAlertMessageHref {
+    pub url_val: FeishuAlertMessageMultiUrl,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageConfirm {
+    pub title: FeishuAlertMessageText,
+    pub text: FeishuAlertMessageText,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum FeishuAlertMessageButtonType {
+    Default,
+    Primary,
+    Danger,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageButton {
+    #[serde(default = "button_string")]
     pub tag: String,
-    pub fields: Vec<FeishuAlertMessageField>,
+    pub text: FeishuAlertMessageText,
+    pub url: Option<String>,
+    pub multi_url: Option<FeishuAlertMessageMultiUrl>,
+    pub r#type: Option<FeishuAlertMessageButtonType>,
+    pub value: Option<Value>,
+    pub confirm: Option<FeishuAlertMessageConfirm>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum FeishuAlertMessageExtra {
+    Image(FeishuAlertMessageImg),
+    Button(FeishuAlertMessageButton),
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageDivModule {
+    pub tag: FeishuAlertMessageElementDivTag,
+    pub text: FeishuAlertMessageText,
+    pub fields: Option<Vec<FeishuAlertMessageField>>,
+    pub extra: Option<FeishuAlertMessageExtra>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageMarkdownModule {
+    pub tag: FeishuAlertMessageElementLarkMdTag,
+    pub content: String,
+    pub href: Option<FeishuAlertMessageHref>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageHrModule {
+    pub tag: FeishuAlertMessageElementHrTag,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageImgModule {
+    pub tag: FeishuAlertMessageElementImgTag,
+    pub img: FeishuAlertMessageImg,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum FeishuAlertMessageNoteElement {
+    Text(FeishuAlertMessageText),
+    Img(FeishuAlertMessageImg),
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FeishuAlertMessageNoteModule {
+    pub tag: FeishuAlertMessageElementNoteTag,
+    pub elements: Vec<FeishuAlertMessageNoteElement>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum FeishuAlertMessageModule {
+    Div(FeishuAlertMessageDivModule),
+    Markdown(FeishuAlertMessageMarkdownModule),
+    Hr(FeishuAlertMessageHrModule),
+    Img(FeishuAlertMessageImgModule),
+    Note(FeishuAlertMessageNoteModule),
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ElementI18n {
+    pub en_us: Vec<FeishuAlertMessageModule>,
+    pub zh_cn: Vec<FeishuAlertMessageModule>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FeishuAlertMessage {
     pub config: FeishuAlertMessageConfig,
     pub header: FeishuAlertMessageHeader,
-    pub elements: Vec<FeishuAlertMessageElement>,
+    pub elements: Option<Vec<FeishuAlertMessageModule>>,
+    pub i18n_elements: ElementI18n,
 }
 
 // {
