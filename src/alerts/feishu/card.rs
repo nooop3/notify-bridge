@@ -30,6 +30,10 @@ pub struct Hr;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
+pub struct Action;
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub struct Note;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -226,6 +230,26 @@ pub struct CardHrModule {
 pub struct CardImageModule {
     pub tag: Img,
     pub img: CardImage,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum ActionElement {
+    Button(CardButton),
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ActionLayout {
+    Bisected,
+    Trisection,
+    Flow,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CardActionModule {
+    pub tag: Action,
+    pub actions: Vec<ActionElement>,
+    pub layout: Option<ActionLayout>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
