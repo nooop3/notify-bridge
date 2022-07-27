@@ -341,7 +341,7 @@ pub struct FeishuAlertMessageNoteModule {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum FeishuAlertMessageModule {
-    Div(FeishuAlertMessageDivModule),
+    Div(Box<FeishuAlertMessageDivModule>),
     Markdown(FeishuAlertMessageMarkdownModule),
     Hr(FeishuAlertMessageHrModule),
     Img(FeishuAlertMessageImgModule),
