@@ -10,7 +10,12 @@ use reqwest::Client;
 
 const FEISHU_OPEN_API_PREFIX: &str = "https://open.feishu.cn/open-apis/bot/v2/hook/";
 
-pub fn notify(title: String, url: String, content: String) -> Message {
+pub fn notify(
+    title: String,
+    url: String,
+    content: String,
+    template: Option<TemplateColor>,
+) -> Message {
     let config = super::card::CardConfig {
         enable_forward: true,
         update_multi: false,
@@ -20,7 +25,7 @@ pub fn notify(title: String, url: String, content: String) -> Message {
             content: title,
             ..Default::default()
         })),
-        template: TemplateColor::Success,
+        template: template.unwrap_or(TemplateColor::Blue),
     };
 
     let div = Module::Div {
@@ -72,8 +77,9 @@ pub async fn post(
     title: String,
     url: String,
     content: String,
+    template: Option<TemplateColor>,
 ) -> Result<(AlertStatus, FeishuAPIResponse), Box<dyn std::error::Error>> {
-    let message = notify(title, url, content);
+    let message = notify(title, url, content, template);
     info!("{}", serde_json::to_string(&message).unwrap());
 
     let client = Client::new();
