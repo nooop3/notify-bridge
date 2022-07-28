@@ -3,11 +3,11 @@ extern crate pretty_env_logger;
 #[macro_use]
 extern crate log;
 
-mod alerts;
 mod common;
 mod error;
 mod feishu;
 mod grafana;
+mod notify;
 mod routes;
 
 use warp::Filter;
