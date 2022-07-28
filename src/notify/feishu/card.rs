@@ -23,9 +23,28 @@ pub struct StringI18n {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct TextElement {
+    pub content: String,
+    pub lines: Option<i32>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case", tag = "tag")]
+pub enum CardTitlePlainText {
+    PlainText(TextElement),
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", tag = "tag", content = "i18n")]
-pub enum CardTitle {
+pub enum CardTitleI18n {
     PlainText(StringI18n),
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum CardTitle {
+    PlainText(CardTitlePlainText),
+    I18n(CardTitleI18n),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -69,12 +88,6 @@ pub enum TemplateColor {
 pub struct CardHeader {
     pub title: CardTitle,
     pub template: TemplateColor,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct TextElement {
-    pub content: String,
-    pub lines: Option<i32>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

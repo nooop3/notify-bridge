@@ -2,7 +2,7 @@ use crate::{
     common::{AlertStatus, FeishuAPIResponse},
     notify::feishu::card::{
         ActionElement, ActionLayout, Card, CardButton, CardButtonType, CardHeader, CardText,
-        CardTitle, Message, Module, NoteElement, StringI18n, TemplateColor, TextElement,
+        CardTitle, CardTitlePlainText, Message, Module, NoteElement, TemplateColor, TextElement,
     },
 };
 
@@ -20,10 +20,10 @@ pub fn notify() -> Message {
         update_multi: false,
     };
     let header = CardHeader {
-        title: CardTitle::PlainText(StringI18n {
-            en_us: title.to_string(),
-            zh_cn: title.to_string(),
-        }),
+        title: CardTitle::PlainText(CardTitlePlainText::PlainText(TextElement {
+            content: title.to_string(),
+            lines: None,
+        })),
         template: TemplateColor::Success,
     };
 
