@@ -42,6 +42,7 @@ pub enum GrafanaAlertState {
     NoData,
     Paused,
     Alerting,
+    #[serde(rename = "ok")]
     OK,
     Pending,
     Unknown,
