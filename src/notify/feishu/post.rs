@@ -10,18 +10,14 @@ use reqwest::Client;
 
 const FEISHU_OPEN_API_PREFIX: &str = "https://open.feishu.cn/open-apis/bot/v2/hook/";
 
-pub fn notify() -> Message {
-    let title = "Alert";
-    let url = "https://grafana.com";
-    let content = "Alert content.";
-
+pub fn notify(title: String, url: String, content: String) -> Message {
     let config = super::card::CardConfig {
         enable_forward: true,
         update_multi: false,
     };
     let header = CardHeader {
         title: CardTitle::PlainText(CardTitlePlainText::PlainText(TextElement {
-            content: title.to_string(),
+            content: title,
             ..Default::default()
         })),
         template: TemplateColor::Success,
@@ -29,7 +25,7 @@ pub fn notify() -> Message {
 
     let div = Module::Div {
         text: Some(CardText::LarkMd(TextElement {
-            content: content.to_string(),
+            content,
             ..Default::default()
         })),
         fields: None,
@@ -44,7 +40,7 @@ pub fn notify() -> Message {
                 content: "View".to_string(),
                 ..Default::default()
             }),
-            url: Some(url.to_string()),
+            url: Some(url),
             multi_url: None,
             r#type: Some(CardButtonType::Primary),
             value: None,
@@ -73,8 +69,11 @@ pub fn notify() -> Message {
 
 pub async fn post(
     api_key: String,
+    title: String,
+    url: String,
+    content: String,
 ) -> Result<(AlertStatus, FeishuAPIResponse), Box<dyn std::error::Error>> {
-    let message = notify();
+    let message = notify(title, url, content);
     info!("{}", serde_json::to_string(&message).unwrap());
 
     let client = Client::new();

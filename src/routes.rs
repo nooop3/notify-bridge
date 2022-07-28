@@ -9,7 +9,7 @@ use crate::{
 
 pub async fn handle_request(
     api_keys: Vec<AlertKeyMap>,
-    _body: GrafanaAlert,
+    body: GrafanaAlert,
 ) -> Result<impl Reply, Rejection> {
     let mut results = Vec::new();
     for api_key in api_keys {
@@ -18,7 +18,14 @@ pub async fn handle_request(
             api_key.destination, api_key.key
         );
         if api_key.destination == AlertDestinations::Feishu {
-            match feishu_post(api_key.key).await {
+            match feishu_post(
+                api_key.key,
+                body.title.clone(),
+                body.rule_url.clone(),
+                body.message.clone(),
+            )
+            .await
+            {
                 Ok((status, response)) => {
                     results.push(AlertResponse {
                         destination: api_key.destination.to_string(),

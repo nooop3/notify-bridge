@@ -28,25 +28,25 @@ use serde::{Deserialize, Serialize};
 */
 
 #[derive(Serialize, Deserialize)]
-struct EvalMatches {
-    value: i32,
-    metric: String,
-    tags: HashMap<String, String>,
+pub struct EvalMatches {
+    pub value: i32,
+    pub metric: String,
+    pub tags: HashMap<String, String>,
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GrafanaAlert {
-    dashboard_id: i32,
-    eval_matches: Vec<EvalMatches>,
-    image_url: String,
-    message: String,
-    org_id: i32,
-    panel_id: i32,
-    rule_id: i32,
-    rule_name: String,
-    rule_url: String,
-    state: String,
-    tags: HashMap<String, String>,
-    title: String,
+    pub dashboard_id: i32,
+    pub eval_matches: Vec<EvalMatches>,
+    pub image_url: String,
+    pub message: String,
+    pub org_id: i32,
+    pub panel_id: i32,
+    pub rule_id: i32,
+    pub rule_name: String,
+    pub rule_url: String,
+    pub state: String,
+    pub tags: HashMap<String, String>,
+    pub title: String,
 }
