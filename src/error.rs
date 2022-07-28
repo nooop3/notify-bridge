@@ -1,6 +1,6 @@
 use serde::Serialize;
 use serde_json::{json, Value};
-use warp::{hyper::StatusCode, reject::Reject};
+use warp::{body::BodyDeserializeError, hyper::StatusCode, reject::Reject};
 
 #[derive(Serialize)]
 struct ErrorMessage {
@@ -23,12 +23,17 @@ pub async fn handle_rejection(err: warp::Rejection) -> Result<impl warp::Reply, 
     let code;
     let message;
 
+    let error_message;
     if err.find::<ConversionError>().is_some()
         || err.find::<warp::reject::InvalidQuery>().is_some()
         || err.find::<warp::reject::InvalidHeader>().is_some()
     {
         code = StatusCode::BAD_REQUEST;
         message = "Bad Request";
+    } else if let Some(e) = err.find::<BodyDeserializeError>() {
+        code = StatusCode::BAD_REQUEST;
+        error_message = e.to_string();
+        message = &error_message;
     } else if let Some(e) = err.find::<FeishuFailedRequestError>() {
         code = StatusCode::BAD_REQUEST;
         message = &e.message;
