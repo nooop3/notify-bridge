@@ -8,20 +8,6 @@ const fn default_false() -> bool {
     false
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "lowercase")]
-pub enum Tag {
-    PlainText,
-    Img,
-    Button,
-    Div,
-    Hr,
-    Action,
-    Note,
-    Markdown,
-    Interactive,
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardConfig {
     #[serde(default = "default_true")]
@@ -37,37 +23,36 @@ pub struct StringI18n {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct CardTitle {
-    // pub tag: Tag::PlainText,
-    pub tag: Tag,
-    pub i18n: StringI18n,
+#[serde(rename_all = "snake_case", tag = "tag", content = "i18n")]
+pub enum CardTitle {
+    PlainText(StringI18n),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum TemplateColor {
     Green,
-    #[serde(alias = "green")]
+    #[serde(rename = "green")]
     Success,
-    #[serde(alias = "green")]
+    #[serde(rename = "green")]
     Completed,
 
     Orange,
-    #[serde(alias = "orange")]
+    #[serde(rename = "orange")]
     Warning,
-    #[serde(alias = "orange")]
+    #[serde(rename = "orange")]
     Notify,
 
     Red,
-    #[serde(alias = "red")]
+    #[serde(rename = "red")]
     Error,
-    #[serde(alias = "red")]
+    #[serde(rename = "red")]
     Failed,
 
     Grey,
-    #[serde(alias = "grey")]
+    #[serde(rename = "grey")]
     Disabled,
-    #[serde(alias = "grey")]
+    #[serde(rename = "grey")]
     Invalid,
 
     Blue,
@@ -87,17 +72,16 @@ pub struct CardHeader {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum CardTextTag {
-    PlainText,
-    LarkMd,
+pub struct TextElement {
+    pub content: String,
+    pub lines: Option<i32>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct CardText {
-    tag: CardTextTag,
-    content: String,
-    lines: Option<i32>,
+#[serde(rename_all = "snake_case", tag = "tag")]
+pub enum CardText {
+    PlainText(TextElement),
+    LarkMd(TextElement),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -115,8 +99,6 @@ pub enum CardImageMode {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardImageElement {
-    // pub tag: Tag::Img,
-    tag: Tag,
     img_key: String,
     alt: CardText,
     preview: Option<bool>,
@@ -124,8 +106,6 @@ pub struct CardImageElement {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardImage {
-    // pub tag: Tag::Img,
-    tag: Tag,
     img_key: String,
     alt: CardText,
     title: Option<CardText>,
@@ -159,29 +139,14 @@ pub enum CardButtonType {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct CardPlainText {
-    // pub tag: Tag::PlainText,
-    tag: Tag,
-    content: String,
-    lines: Option<i32>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CardConfirmText {
-    pub title: CardPlainText,
-    pub text: CardPlainText,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
 pub struct CardConfirm {
-    pub title: CardConfirmText,
-    pub text: CardConfirmText,
+    // pub title: CardText::PlainText(TextElement),
+    pub title: CardText,
+    pub text: CardText,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardButton {
-    // pub tag: Tag::Button,
-    pub tag: Tag,
     pub text: CardText,
     pub url: Option<String>,
     pub multi_url: Option<CardMultiUrl>,
@@ -191,34 +156,14 @@ pub struct CardButton {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case", tag = "tag")]
 pub enum CardExtra {
-    Image(CardImage),
+    Img(CardImage),
     Button(Box<CardButton>),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct CardDivModule {
-    // pub tag: Tag::Div,
-    pub tag: Tag,
-    pub text: Option<CardText>,
-    pub fields: Option<Vec<CardField>>,
-    pub extra: Option<CardExtra>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CardHrModule {
-    // pub tag: Tag::Hr,
-    pub tag: Tag,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CardImageModule {
-    // pub tag: Tag::Img,
-    pub tag: Tag,
-    pub img: CardImage,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case", tag = "tag")]
 pub enum ActionElement {
     Button(CardButton),
 }
@@ -232,60 +177,54 @@ pub enum ActionLayout {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct CardActionModule {
-    // pub tag: Tag::Action,
-    pub tag: Tag,
-    pub actions: Vec<ActionElement>,
-    pub layout: Option<ActionLayout>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case", tag = "tag")]
 pub enum NoteElement {
-    Text(CardText),
-    Image(CardImageElement),
+    PlainText(TextElement),
+    LarkMd(TextElement),
+    Img(CardImageElement),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct CardNoteModule {
-    // pub tag: Tag::Note,
-    pub tag: Tag,
-    pub elements: Vec<NoteElement>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CardMarkdownModule {
-    // pub tag: Tag::Markdown,
-    pub tag: Tag,
-    pub content: String,
-    pub href: Option<CardHref>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub enum Element {
-    Div(Box<CardDivModule>),
-    Hr(CardHrModule),
-    Image(CardImageModule),
-    Note(CardNoteModule),
-    Markdown(CardMarkdownModule),
+#[serde(rename_all = "snake_case", tag = "tag")]
+pub enum Module {
+    Div {
+        text: Option<CardText>,
+        fields: Option<Vec<CardField>>,
+        extra: Option<CardExtra>,
+    },
+    Hr,
+    Img {
+        img: CardImage,
+    },
+    Action {
+        actions: Vec<ActionElement>,
+        layout: Option<ActionLayout>,
+    },
+    Note {
+        elements: Vec<NoteElement>,
+    },
+    Markdown {
+        content: String,
+        href: Option<CardHref>,
+    },
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ElementI18n {
-    pub en_us: Vec<Element>,
-    pub zh_cn: Vec<Element>,
+    pub en_us: Vec<Module>,
+    pub zh_cn: Vec<Module>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Card {
     pub config: CardConfig,
     pub header: CardHeader,
-    pub elements: Option<Vec<Element>>,
-    pub i18n_elements: ElementI18n,
+    pub elements: Option<Vec<Module>>,
+    pub i18n_elements: Option<ElementI18n>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Message {
-    // Tag::Internactive,
-    pub msg_type: Tag,
-    pub card: Card,
+#[serde(rename_all = "snake_case", tag = "msg_type", content = "card")]
+pub enum Message {
+    Interactive(Card),
 }

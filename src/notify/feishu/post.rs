@@ -1,6 +1,9 @@
 use crate::{
     common::{AlertStatus, FeishuAPIResponse},
-    notify::feishu::card::{Card, CardHeader, CardTitle, Message, StringI18n, Tag, TemplateColor},
+    notify::feishu::card::{
+        Card, CardHeader, CardTitle, Message, Module, NoteElement, StringI18n, TemplateColor,
+        TextElement,
+    },
 };
 
 use reqwest::Client;
@@ -15,30 +18,33 @@ pub fn notify() -> Message {
         update_multi: false,
     };
     let header = CardHeader {
-        title: CardTitle {
-            tag: Tag::PlainText,
-            i18n: StringI18n {
-                en_us: title.to_string(),
-                zh_cn: title.to_string(),
-            },
-        },
+        title: CardTitle::PlainText(StringI18n {
+            en_us: title.to_string(),
+            zh_cn: title.to_string(),
+        }),
         template: TemplateColor::Success,
+    };
+
+    let note = Module::Note {
+        elements: vec![NoteElement::PlainText(TextElement {
+            content: "Note: You may need related permissions to open the buttons above."
+                .to_string(),
+            lines: None,
+        })],
     };
 
     let card = Card {
         config,
         header,
-        elements: None,
-        i18n_elements: super::card::ElementI18n {
-            en_us: vec![],
-            zh_cn: vec![],
-        },
+        i18n_elements: None,
+        elements: Some(vec![note]),
+        // i18n_elements: Some(ElementI18n {
+        //     en_us: vec![Module::Note(note)],
+        //     zh_cn: vec![],
+        // }),
     };
 
-    Message {
-        msg_type: Tag::Interactive,
-        card,
-    }
+    Message::Interactive(card)
 }
 
 pub async fn post(
