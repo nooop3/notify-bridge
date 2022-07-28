@@ -1,1 +1,1 @@
-mod feishu;
+pub(crate) mod feishu;

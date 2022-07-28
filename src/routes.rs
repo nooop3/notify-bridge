@@ -3,8 +3,8 @@ use warp::{filters::BoxedFilter, hyper::StatusCode, Filter, Rejection, Reply};
 use crate::{
     common::{check_api_key, AlertDestinations, AlertKeyMap, AlertResponse, Response},
     error::FeishuFailedRequestError,
-    feishu::post_feishu_alert,
     grafana::GrafanaAlert,
+    notify::feishu::post::post as feishu_post,
 };
 
 pub async fn handle_request(
@@ -18,7 +18,7 @@ pub async fn handle_request(
             api_key.destination, api_key.key
         );
         if api_key.destination == AlertDestinations::Feishu {
-            match post_feishu_alert(api_key.key).await {
+            match feishu_post(api_key.key).await {
                 Ok((status, response)) => {
                     results.push(AlertResponse {
                         destination: api_key.destination.to_string(),

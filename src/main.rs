@@ -5,7 +5,6 @@ extern crate log;
 
 mod common;
 mod error;
-mod feishu;
 mod grafana;
 mod notify;
 mod routes;

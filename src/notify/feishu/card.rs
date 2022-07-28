@@ -10,39 +10,17 @@ const fn default_false() -> bool {
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
-pub struct PlainText;
-
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "lowercase")]
-pub struct Img;
-
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "lowercase")]
-pub struct Button;
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub struct Div;
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub struct Hr;
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub struct Action;
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub struct Note;
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub struct Markdown;
-
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "lowercase")]
-pub struct Internactive;
+pub enum Tag {
+    PlainText,
+    Img,
+    Button,
+    Div,
+    Hr,
+    Action,
+    Note,
+    Markdown,
+    Interactive,
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardConfig {
@@ -60,7 +38,8 @@ pub struct StringI18n {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardTitle {
-    pub tag: PlainText,
+    // pub tag: Tag::PlainText,
+    pub tag: Tag,
     pub i18n: StringI18n,
 }
 
@@ -136,7 +115,8 @@ pub enum CardImageMode {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardImageElement {
-    tag: Img,
+    // pub tag: Tag::Img,
+    tag: Tag,
     img_key: String,
     alt: CardText,
     preview: Option<bool>,
@@ -144,7 +124,8 @@ pub struct CardImageElement {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardImage {
-    tag: Img,
+    // pub tag: Tag::Img,
+    tag: Tag,
     img_key: String,
     alt: CardText,
     title: Option<CardText>,
@@ -179,7 +160,8 @@ pub enum CardButtonType {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardPlainText {
-    tag: PlainText,
+    // pub tag: Tag::PlainText,
+    tag: Tag,
     content: String,
     lines: Option<i32>,
 }
@@ -198,7 +180,8 @@ pub struct CardConfirm {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardButton {
-    pub tag: Button,
+    // pub tag: Tag::Button,
+    pub tag: Tag,
     pub text: CardText,
     pub url: Option<String>,
     pub multi_url: Option<CardMultiUrl>,
@@ -215,7 +198,8 @@ pub enum CardExtra {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardDivModule {
-    pub tag: Div,
+    // pub tag: Tag::Div,
+    pub tag: Tag,
     pub text: Option<CardText>,
     pub fields: Option<Vec<CardField>>,
     pub extra: Option<CardExtra>,
@@ -223,12 +207,14 @@ pub struct CardDivModule {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardHrModule {
-    pub tag: Hr,
+    // pub tag: Tag::Hr,
+    pub tag: Tag,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardImageModule {
-    pub tag: Img,
+    // pub tag: Tag::Img,
+    pub tag: Tag,
     pub img: CardImage,
 }
 
@@ -247,7 +233,8 @@ pub enum ActionLayout {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardActionModule {
-    pub tag: Action,
+    // pub tag: Tag::Action,
+    pub tag: Tag,
     pub actions: Vec<ActionElement>,
     pub layout: Option<ActionLayout>,
 }
@@ -260,13 +247,15 @@ pub enum NoteElement {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardNoteModule {
-    pub tag: Note,
+    // pub tag: Tag::Note,
+    pub tag: Tag,
     pub elements: Vec<NoteElement>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardMarkdownModule {
-    pub tag: Markdown,
+    // pub tag: Tag::Markdown,
+    pub tag: Tag,
     pub content: String,
     pub href: Option<CardHref>,
 }
@@ -296,6 +285,7 @@ pub struct Card {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Message {
-    pub msg_type: Internactive,
+    // Tag::Internactive,
+    pub msg_type: Tag,
     pub card: Card,
 }
