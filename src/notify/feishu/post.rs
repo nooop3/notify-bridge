@@ -22,7 +22,7 @@ pub fn notify() -> Message {
     let header = CardHeader {
         title: CardTitle::PlainText(CardTitlePlainText::PlainText(TextElement {
             content: title.to_string(),
-            lines: None,
+            ..Default::default()
         })),
         template: TemplateColor::Success,
     };
@@ -30,7 +30,7 @@ pub fn notify() -> Message {
     let div = Module::Div {
         text: Some(CardText::LarkMd(TextElement {
             content: content.to_string(),
-            lines: None,
+            ..Default::default()
         })),
         fields: None,
         extra: None,
@@ -42,7 +42,7 @@ pub fn notify() -> Message {
         actions: vec![ActionElement::Button(CardButton {
             text: CardText::LarkMd(TextElement {
                 content: "View".to_string(),
-                lines: None,
+                ..Default::default()
             }),
             url: Some(url.to_string()),
             multi_url: None,
@@ -57,7 +57,7 @@ pub fn notify() -> Message {
         elements: vec![NoteElement::PlainText(TextElement {
             content: "Note: You may need related permissions to open the buttons above."
                 .to_string(),
-            lines: None,
+            ..Default::default()
         })],
     };
 
