@@ -25,6 +25,7 @@ pub struct StringI18n {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TextElement {
     pub content: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub lines: Option<i32>,
 }
 
@@ -114,6 +115,7 @@ pub enum CardImageMode {
 pub struct CardImageElement {
     img_key: String,
     alt: CardText,
+    #[serde(skip_serializing_if = "Option::is_none")]
     preview: Option<bool>,
 }
 
@@ -121,11 +123,15 @@ pub struct CardImageElement {
 pub struct CardImage {
     img_key: String,
     alt: CardText,
+    #[serde(skip_serializing_if = "Option::is_none")]
     title: Option<CardText>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     custom_width: Option<i32>,
     #[serde(default = "default_false")]
     compact_width: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
     mode: Option<CardImageMode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     preview: Option<bool>,
 }
 
@@ -161,10 +167,15 @@ pub struct CardConfirm {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardButton {
     pub text: CardText,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub multi_url: Option<CardMultiUrl>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<CardButtonType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub confirm: Option<CardConfirm>,
 }
 
@@ -201,8 +212,11 @@ pub enum NoteElement {
 #[serde(rename_all = "snake_case", tag = "tag")]
 pub enum Module {
     Div {
+        #[serde(skip_serializing_if = "Option::is_none")]
         text: Option<CardText>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         fields: Option<Vec<CardField>>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         extra: Option<CardExtra>,
     },
     Hr,
@@ -211,6 +225,7 @@ pub enum Module {
     },
     Action {
         actions: Vec<ActionElement>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         layout: Option<ActionLayout>,
     },
     Note {
@@ -218,6 +233,7 @@ pub enum Module {
     },
     Markdown {
         content: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
         href: Option<CardHref>,
     },
 }
@@ -232,7 +248,9 @@ pub struct ElementI18n {
 pub struct Card {
     pub config: CardConfig,
     pub header: CardHeader,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub elements: Option<Vec<Module>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub i18n_elements: Option<ElementI18n>,
 }
 
