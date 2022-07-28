@@ -1,8 +1,8 @@
 use crate::{
     common::{AlertStatus, FeishuAPIResponse},
     notify::feishu::card::{
-        Card, CardHeader, CardTitle, Message, Module, NoteElement, StringI18n, TemplateColor,
-        TextElement,
+        ActionElement, ActionLayout, Card, CardButton, CardButtonType, CardHeader, CardText,
+        CardTitle, Message, Module, NoteElement, StringI18n, TemplateColor, TextElement,
     },
 };
 
@@ -12,6 +12,8 @@ const FEISHU_OPEN_API_PREFIX: &str = "https://open.feishu.cn/open-apis/bot/v2/ho
 
 pub fn notify() -> Message {
     let title = "Alert";
+    let url = "https://grafana.com";
+    let content = "Alert content.";
 
     let config = super::card::CardConfig {
         enable_forward: true,
@@ -23,6 +25,32 @@ pub fn notify() -> Message {
             zh_cn: title.to_string(),
         }),
         template: TemplateColor::Success,
+    };
+
+    let div = Module::Div {
+        text: Some(CardText::LarkMd(TextElement {
+            content: content.to_string(),
+            lines: None,
+        })),
+        fields: None,
+        extra: None,
+    };
+
+    let hr = Module::Hr;
+
+    let action = Module::Action {
+        actions: vec![ActionElement::Button(CardButton {
+            text: CardText::LarkMd(TextElement {
+                content: "View".to_string(),
+                lines: None,
+            }),
+            url: Some(url.to_string()),
+            multi_url: None,
+            r#type: Some(CardButtonType::Primary),
+            value: None,
+            confirm: None,
+        })],
+        layout: Some(ActionLayout::Flow),
     };
 
     let note = Module::Note {
@@ -37,11 +65,7 @@ pub fn notify() -> Message {
         config,
         header,
         i18n_elements: None,
-        elements: Some(vec![note]),
-        // i18n_elements: Some(ElementI18n {
-        //     en_us: vec![Module::Note(note)],
-        //     zh_cn: vec![],
-        // }),
+        elements: Some(vec![div, hr, action, note]),
     };
 
     Message::Interactive(card)
