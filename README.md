@@ -14,8 +14,8 @@
 
 ```bash
 # DOCKER_BUILDKIT=1 docker build --tag notify-bridge .
-# docker build --build-arg BUILDER_SUFFIX=disable-crates-mirror --tag notify-bridge .
-docker build --tag notify-bridge .
+# DOCKER_BUILDKIT=1 docker build --build-arg BUILDER_SUFFIX=disable-mirror --tag notify-bridge .
+DOCKER_BUILDKIT=1 docker build --tag notify-bridge .
 ```
 
 ### Run
