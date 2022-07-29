@@ -28,7 +28,7 @@ FROM builder-${BUILDER_SUFFIX} as builder
 
 RUN <<EOF
 apt-get update
-apt-get install -y libssl-dev pkg-config musl-tools
+apt-get install -y libssl-dev pkg-config musl-tools libfindbin-libs-perl make
 rm -rf /var/lib/apt/lists/*
 EOF
 
@@ -59,7 +59,7 @@ RUN touch /usr/src/app/src/main.rs
 # This is the actual application build.
 RUN cargo build --target x86_64-unknown-linux-musl --release
 
-FROM alpine:3.16.1 AS runtime 
+FROM alpine:3.16.1 AS runtime
 
 # Copy application binary from builder image
 COPY --from=builder /usr/src/app/target/x86_64-unknown-linux-musl/release/app /usr/local/bin
