@@ -21,5 +21,5 @@ DOCKER_BUILDKIT=1 docker build --tag notify-bridge .
 ### Run
 
 ```bash
-docker run -it --rm notify-bridge bash
+docker run -it --rm -p 3030:3030 -e RUST_LOG=info notify-bridge
 ```
