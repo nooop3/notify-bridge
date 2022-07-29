@@ -19,11 +19,20 @@ pub async fn handle_request(
         );
         if api_key.destination == AlertDestinations::Feishu {
             let template = alert_state_to_feishu_template_color(&body.state);
+            let message = body.message.clone().unwrap_or_else(|| "".to_string());
+            let message = format!(
+                "**{}**\nMessage: {}\n - Metric: {}\n - Value: {}\n - State: {}",
+                body.rule_name,
+                message,
+                body.eval_matches[0].metric,
+                body.eval_matches[0].value,
+                body.state,
+            );
             match feishu_post(
                 api_key.key,
                 body.title.clone(),
-                body.rule_url.clone(),
-                body.message.clone(),
+                body.rule_url.clone().unwrap_or_else(|| "".to_string()),
+                message,
                 Some(template),
             )
             .await

@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
+use strum::Display;
 
 use crate::notify::feishu::card::TemplateColor;
 
@@ -36,7 +37,7 @@ pub struct EvalMatches {
     pub tags: HashMap<String, String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Display)]
 #[serde(rename_all = "snake_case")]
 pub enum GrafanaAlertState {
     NoData,
@@ -51,18 +52,18 @@ pub enum GrafanaAlertState {
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GrafanaAlert {
-    pub dashboard_id: i32,
-    pub eval_matches: Vec<EvalMatches>,
-    pub image_url: String,
-    pub message: String,
-    pub org_id: i32,
-    pub panel_id: i32,
+    pub title: String,
     pub rule_id: i32,
     pub rule_name: String,
-    pub rule_url: String,
     pub state: GrafanaAlertState,
+    pub eval_matches: Vec<EvalMatches>,
+    pub org_id: i32,
+    pub dashboard_id: i32,
+    pub panel_id: i32,
     pub tags: HashMap<String, String>,
-    pub title: String,
+    pub rule_url: Option<String>,
+    pub image_url: Option<String>,
+    pub message: Option<String>,
 }
 
 pub fn alert_state_to_feishu_template_color(state: &GrafanaAlertState) -> TemplateColor {
