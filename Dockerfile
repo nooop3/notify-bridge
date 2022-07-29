@@ -1,5 +1,17 @@
 # syntax=docker/dockerfile:1
-FROM rust:1.62.1-slim-bullseye as builder
+ARG BUILDER_SUFFIX=enable-crates-mirror
+
+FROM rust:1.62.1-slim-bullseye as builder-disable-crates-mirror
+ONBUILD echo "No need for Crates mirror."
+
+FROM rust:1.62.1-slim-bullseye as builder-enable-crates-mirror
+ONBUILD COPY <<EOF /usr/src/.cargo/config.toml
+[source.crates-io]
+replace-with = 'tuna'
+
+[source.tuna]
+registry = "https://mirrors.tuna.tsinghua.edu.cn/git/crates.io-index.git"
+EOF
 
 WORKDIR /usr/src
 
@@ -30,7 +42,7 @@ RUN cargo build --target x86_64-unknown-linux-musl --release
 FROM alpine:3.16.0 AS runtime 
 
 # Copy application binary from builder image
-COPY --from=builder /usr/src/app/target/x86_64-unknown-linux-musl/release/app /usr/local/bin
+COPY --from=builder-${BUILDER_SUFFIX} /usr/src/app/target/x86_64-unknown-linux-musl/release/app /usr/local/bin
 
 # Run the application
 CMD ["/usr/local/bin/app"]
