@@ -45,7 +45,7 @@ COPY Cargo.toml Cargo.lock /usr/src/notify-bridge/
 WORKDIR /usr/src/notify-bridge
 
 ## Install target platform (Cross-Compilation) --> Needed for Alpine
-RUN rustup target add x86_64-unknown-linux-musl
+RUN rustup default nightly && rustup target add x86_64-unknown-linux-musl
 
 # This is a dummy build to get the dependencies cached.
 RUN cargo build --target x86_64-unknown-linux-musl --release --locked
