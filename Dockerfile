@@ -36,33 +36,33 @@ WORKDIR /usr/src
 
 ENV PKG_CONFIG_ALLOW_CROSS=1
 # Create a new empty shell project
-RUN USER=root cargo new --bin app
+RUN USER=root cargo new --bin notify-bridge
 
 # Copy manifests
-COPY Cargo.toml Cargo.lock /usr/src/app/
+COPY Cargo.toml Cargo.lock /usr/src/notify-bridge/
 
 # Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /usr/src/notify-bridge
 
 ## Install target platform (Cross-Compilation) --> Needed for Alpine
 RUN rustup target add x86_64-unknown-linux-musl
 
 # This is a dummy build to get the dependencies cached.
-RUN cargo build --target x86_64-unknown-linux-musl --release
+RUN cargo build --target x86_64-unknown-linux-musl --release --locked
 
 # Now copy in the rest of the sources
-COPY src /usr/src/app/src/
+COPY src /usr/src/notify-bridge/src/
 
 ## Touch main.rs to prevent cached release build
-RUN touch /usr/src/app/src/main.rs
+RUN touch /usr/src/notify-bridge/src/main.rs
 
 # This is the actual application build.
-RUN cargo build --target x86_64-unknown-linux-musl --release
+RUN cargo build --target x86_64-unknown-linux-musl --release --locked
 
 FROM alpine:3.16.1 AS runtime
 
 # Copy application binary from builder image
-COPY --from=builder /usr/src/app/target/x86_64-unknown-linux-musl/release/app /usr/local/bin
+COPY --from=builder /usr/src/notify-bridge/target/x86_64-unknown-linux-musl/release/notify-bridge /usr/local/bin
 
 # Run the application
-CMD ["/usr/local/bin/app"]
+CMD ["/usr/local/bin/notify-bridge"]
