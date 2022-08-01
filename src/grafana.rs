@@ -30,7 +30,7 @@ use crate::notify::feishu::card::TemplateColor;
 }
 */
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EvalMatches {
     pub value: i32,
     pub metric: String,
@@ -49,7 +49,7 @@ pub enum GrafanaAlertState {
     Unknown,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GrafanaAlert {
     pub title: String,

@@ -80,7 +80,10 @@ pub async fn post(
     template: Option<TemplateColor>,
 ) -> Result<(AlertStatus, FeishuAPIResponse), Box<dyn std::error::Error>> {
     let message = notify(title, url, content, template);
-    info!("{}", serde_json::to_string(&message).unwrap());
+    info!(
+        "Notify Feishu: {}",
+        serde_json::to_string(&message).unwrap()
+    );
 
     let client = Client::new();
     let response = client

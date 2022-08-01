@@ -11,12 +11,13 @@ pub async fn handle_request(
     api_keys: Vec<AlertKeyMap>,
     body: GrafanaAlert,
 ) -> Result<impl Reply, Rejection> {
+    info!(
+        "Received Grafana alert: {}",
+        serde_json::to_string(&body).unwrap()
+    );
+
     let mut results = Vec::new();
     for api_key in api_keys {
-        info!(
-            "Destination: {:?}, key: {}",
-            api_key.destination, api_key.key
-        );
         if api_key.destination == AlertDestinations::Feishu {
             let template = alert_state_to_feishu_template_color(&body.state);
             let message = body.message.clone().unwrap_or_else(|| "".to_string());
