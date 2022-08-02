@@ -105,3 +105,30 @@ pub fn check_api_key() -> impl Filter<Extract = (Vec<AlertKeyMap>,), Error = Rej
             .collect()
     })
 }
+
+// pub fn log_json<T: DeserializeOwned + Send>() -> impl Filter<Extract = (T,), Error = Rejection> + Copy {
+//     is_content_type::<Json>()
+//         .and(bytes())
+//         .and_then(|buf| async move {
+//             Json::decode(buf).map_err(|err| {
+//                 // tracing::debug!("request json body error: {}", err);
+//                 reject::known(BodyDeserializeError { cause: err })
+//             })
+//         })
+// }
+// pub fn log_body<T: DeserializeOwned + Send>() -> impl Filter<Extract = (T,), Error = Rejection> + Copy {
+//     warp::body::bytes()
+//         .and(|body: bytes::Bytes| async move {
+//             // info!("{}", String::from_utf8_lossy(&body));
+//             // info!("bytes = {:?}", body);
+//             // info!("Received body: {}", std::str::from_utf8(body).expect("Error converting bytes to &str"));
+//             info!("Received body: {}", String::from_utf8_lossy(&body));
+//             // serde_json::from_slice(&body).map_err(Into::into)
+//             // .map_err(|err: E| {
+//             //     // tracing::debug!("request json body error: {}", err);
+//             //     info!("request json body error: {}", err);
+//             //     // warp::reject::custom(BodyDeserializeError { cause: err })
+//             //     warp::reject::custom(ConversionError)
+//             // })
+//         })
+// }

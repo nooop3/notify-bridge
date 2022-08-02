@@ -32,7 +32,7 @@ use crate::notify::feishu::card::TemplateColor;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EvalMatches {
-    pub value: i32,
+    pub value: f64,
     pub metric: String,
     pub tags: HashMap<String, String>,
 }

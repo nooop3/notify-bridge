@@ -33,6 +33,7 @@ pub async fn handle_rejection(err: warp::Rejection) -> Result<impl warp::Reply, 
     } else if let Some(e) = err.find::<BodyDeserializeError>() {
         code = StatusCode::BAD_REQUEST;
         error_message = e.to_string();
+        info!("Body deserializer error: {}", error_message);
         message = &error_message;
     } else if let Some(e) = err.find::<FeishuFailedRequestError>() {
         code = StatusCode::BAD_REQUEST;

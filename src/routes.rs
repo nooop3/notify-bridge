@@ -69,6 +69,7 @@ pub fn grafana_alerts() -> BoxedFilter<(impl Reply,)> {
     warp::post()
         .and(warp::path!("api" / "v1" / "grafana" / "alerts"))
         .and(check_api_key())
+        // .and(log_body())
         .and(warp::body::json())
         .and_then(handle_request)
         .boxed()
