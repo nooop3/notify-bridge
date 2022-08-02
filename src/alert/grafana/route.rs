@@ -1,9 +1,10 @@
 use warp::{filters::BoxedFilter, hyper::StatusCode, Filter, Rejection, Reply};
 
 use crate::{
+    alert::grafana::{message::GrafanaAlert, transform::alert_state_to_feishu_template_color},
     common::{check_api_key, AlertDestinations, AlertKeyMap, AlertResponse, Response},
     error::FeishuFailedRequestError,
-    notify::feishu::post::post as feishu_post, alert::grafana::{message::GrafanaAlert, transform::alert_state_to_feishu_template_color},
+    notify::feishu::post::post as feishu_post,
 };
 
 pub async fn handle_request(

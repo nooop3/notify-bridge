@@ -3,15 +3,14 @@ extern crate pretty_env_logger;
 #[macro_use]
 extern crate log;
 
+mod alert;
 mod common;
 mod error;
 mod notify;
-mod routes;
-mod alert;
 
 use warp::Filter;
 
-use crate::{error::handle_rejection, routes::grafana_alerts};
+use crate::{alert::grafana::route::grafana_alerts, error::handle_rejection};
 
 #[tokio::main]
 async fn main() {
