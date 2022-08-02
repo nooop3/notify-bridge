@@ -5,9 +5,9 @@ extern crate log;
 
 mod common;
 mod error;
-mod grafana;
 mod notify;
 mod routes;
+mod alert;
 
 use warp::Filter;
 

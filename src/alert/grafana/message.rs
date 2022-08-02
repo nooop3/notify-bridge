@@ -3,8 +3,6 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
-use crate::notify::feishu::card::TemplateColor;
-
 /*
 {
   "dashboardId": 1,
@@ -64,15 +62,4 @@ pub struct GrafanaAlert {
     pub rule_url: Option<String>,
     pub image_url: Option<String>,
     pub message: Option<String>,
-}
-
-pub fn alert_state_to_feishu_template_color(state: &GrafanaAlertState) -> TemplateColor {
-    match state {
-        GrafanaAlertState::NoData => TemplateColor::Red,
-        GrafanaAlertState::Paused => TemplateColor::Yellow,
-        GrafanaAlertState::Alerting => TemplateColor::Red,
-        GrafanaAlertState::OK => TemplateColor::Green,
-        GrafanaAlertState::Pending => TemplateColor::Yellow,
-        GrafanaAlertState::Unknown => TemplateColor::Yellow,
-    }
 }
