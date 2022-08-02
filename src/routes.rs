@@ -21,13 +21,15 @@ pub async fn handle_request(
         if api_key.destination == AlertDestinations::Feishu {
             let template = alert_state_to_feishu_template_color(&body.state);
             let message = body.message.clone().unwrap_or_else(|| "".to_string());
+            let eval_matches = body
+                .eval_matches
+                .iter()
+                .map(|m| format!("- Matric: {}, Value: {}", m.metric, m.value))
+                .collect::<Vec<String>>()
+                .join("\n");
             let message = format!(
-                "**{}**\nMessage: {}\n - Metric: {}\n - Value: {}\n - State: {}",
-                body.rule_name,
-                message,
-                body.eval_matches[0].metric,
-                body.eval_matches[0].value,
-                body.state,
+                "**{}**\nMessage: {}\n{}\n- State: {}",
+                body.rule_name, message, eval_matches, body.state,
             );
             match feishu_post(
                 api_key.key,
