@@ -1,12 +1,12 @@
-use crate::{alert::grafana::message::GrafanaAlertState, notify::feishu::card::TemplateColor};
+use crate::{alert::grafana::message::AlertState, notify::feishu::card::TemplateColor};
 
-pub fn alert_state_to_feishu_template_color(state: &GrafanaAlertState) -> TemplateColor {
+pub fn alert_state_to_feishu_template_color(state: &AlertState) -> TemplateColor {
     match state {
-        GrafanaAlertState::NoData => TemplateColor::Red,
-        GrafanaAlertState::Paused => TemplateColor::Yellow,
-        GrafanaAlertState::Alerting => TemplateColor::Red,
-        GrafanaAlertState::OK => TemplateColor::Green,
-        GrafanaAlertState::Pending => TemplateColor::Yellow,
-        GrafanaAlertState::Unknown => TemplateColor::Yellow,
+        AlertState::NoData => TemplateColor::Red,
+        AlertState::Paused => TemplateColor::Yellow,
+        AlertState::Alerting => TemplateColor::Red,
+        AlertState::OK => TemplateColor::Green,
+        AlertState::Pending => TemplateColor::Yellow,
+        AlertState::Unknown => TemplateColor::Yellow,
     }
 }

@@ -1,8 +1,12 @@
 use crate::{
-    common::{AlertStatus, FeishuAPIResponse},
-    notify::feishu::card::{
-        ActionElement, ActionLayout, Card, CardButton, CardButtonType, CardHeader, CardText,
-        CardTitle, CardTitlePlainText, Message, Module, NoteElement, TemplateColor, TextElement,
+    common::AlertStatus,
+    notify::feishu::{
+        api_define::APIResponse,
+        card::{
+            ActionElement, ActionLayout, Card, CardButton, CardButtonType, CardHeader, CardText,
+            CardTitle, CardTitlePlainText, Message, Module, NoteElement, TemplateColor,
+            TextElement,
+        },
     },
 };
 
@@ -78,7 +82,7 @@ pub async fn post(
     url: String,
     content: String,
     template: Option<TemplateColor>,
-) -> Result<(AlertStatus, FeishuAPIResponse), Box<dyn std::error::Error>> {
+) -> Result<(AlertStatus, APIResponse), Box<dyn std::error::Error>> {
     let message = notify(title, url, content, template);
     info!(
         "Notify Feishu: {}",
@@ -94,10 +98,10 @@ pub async fn post(
 
     match response.status() {
         reqwest::StatusCode::OK => {
-            let response: FeishuAPIResponse = response.json().await?;
+            let response: APIResponse = response.json().await?;
             let status = match response {
-                FeishuAPIResponse::FeishuAPISuccessResponse(_) => AlertStatus::Success,
-                FeishuAPIResponse::FeishuAPIErrorResponse(_) => AlertStatus::Failed,
+                APIResponse::APISuccessResponse(_) => AlertStatus::Success,
+                APIResponse::APIErrorResponse(_) => AlertStatus::Failed,
             };
             Ok((status, response))
         }

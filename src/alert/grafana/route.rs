@@ -1,15 +1,17 @@
 use warp::{filters::BoxedFilter, hyper::StatusCode, Filter, Rejection, Reply};
 
 use crate::{
-    alert::grafana::{message::GrafanaAlert, transform::alert_state_to_feishu_template_color},
-    common::{check_api_key, AlertDestinations, AlertKeyMap, AlertResponse, Response},
+    alert::grafana::{message::AlertBody, transform::alert_state_to_feishu_template_color},
+    common::{check_api_key, AlertDestinations, AlertKeyMap, NotifyResponseEnum, Response},
     error::FeishuFailedRequestError,
-    notify::feishu::post::post as feishu_post,
+    notify::feishu::{
+        api_define::NotifyResponse as FeishuNotifyResponse, post::post as feishu_post,
+    },
 };
 
 pub async fn handle_request(
     api_keys: Vec<AlertKeyMap>,
-    body: GrafanaAlert,
+    body: AlertBody,
 ) -> Result<impl Reply, Rejection> {
     info!(
         "Received Grafana alert: {}",
@@ -41,11 +43,11 @@ pub async fn handle_request(
             .await
             {
                 Ok((status, response)) => {
-                    results.push(AlertResponse {
+                    results.push(NotifyResponseEnum::Feishu(FeishuNotifyResponse {
                         destination: api_key.destination.to_string(),
                         status,
                         result: response,
-                    });
+                    }));
                 }
                 Err(err) => {
                     return Err(warp::reject::custom(FeishuFailedRequestError {

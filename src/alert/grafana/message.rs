@@ -37,7 +37,7 @@ pub struct EvalMatches {
 
 #[derive(Debug, Serialize, Deserialize, Display)]
 #[serde(rename_all = "snake_case")]
-pub enum GrafanaAlertState {
+pub enum AlertState {
     NoData,
     Paused,
     Alerting,
@@ -49,11 +49,11 @@ pub enum GrafanaAlertState {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct GrafanaAlert {
+pub struct AlertBody {
     pub title: String,
     pub rule_id: i32,
     pub rule_name: String,
-    pub state: GrafanaAlertState,
+    pub state: AlertState,
     pub eval_matches: Vec<EvalMatches>,
     pub org_id: i32,
     pub dashboard_id: i32,
