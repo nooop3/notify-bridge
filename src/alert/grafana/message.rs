@@ -32,7 +32,7 @@ use strum::Display;
 pub struct EvalMatches {
     pub value: f64,
     pub metric: String,
-    pub tags: HashMap<String, String>,
+    pub tags: Option<HashMap<String, String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Display)]
