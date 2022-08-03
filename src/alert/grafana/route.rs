@@ -69,7 +69,7 @@ pub async fn handle_request(
 
 // POST /api/v1/grafana/alerts?apiKey=<api-key>,<api-key>
 // apiKey format: "feishu_<API_KEY>,feishu_<API_KEY>"
-pub fn grafana_alerts() -> BoxedFilter<(impl Reply,)> {
+pub fn alert() -> BoxedFilter<(impl Reply,)> {
     warp::post()
         .and(warp::path!("api" / "v1" / "grafana" / "alerts"))
         .and(check_api_key())
