@@ -24,7 +24,10 @@ pub async fn handle_rejection(err: warp::Rejection) -> Result<impl warp::Reply, 
     let message;
 
     let error_message;
-    if err.find::<ConversionError>().is_some()
+    if err.is_not_found() {
+        code = StatusCode::NOT_FOUND;
+        message = "NOT_FOUND";
+    } else if err.find::<ConversionError>().is_some()
         || err.find::<warp::reject::InvalidQuery>().is_some()
         || err.find::<warp::reject::InvalidHeader>().is_some()
     {
