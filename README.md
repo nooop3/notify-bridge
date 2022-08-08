@@ -3,6 +3,7 @@
 ## Supported Alert Applications
 
 - [Grafana](http://grafana.com/)
+- [Alicloud Monitor](https://www.aliyun.com/product/jiankong)
 
 ## Supported Notify Applications
 

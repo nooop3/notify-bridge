@@ -1,6 +1,10 @@
 use serde::Serialize;
 use serde_json::{json, Value};
-use warp::{body::BodyDeserializeError, hyper::StatusCode, reject::Reject};
+use warp::{
+    body::BodyDeserializeError,
+    hyper::StatusCode,
+    reject::{Reject, UnsupportedMediaType},
+};
 
 #[derive(Serialize)]
 struct ErrorMessage {
@@ -27,6 +31,11 @@ pub async fn handle_rejection(err: warp::Rejection) -> Result<impl warp::Reply, 
     if err.is_not_found() {
         code = StatusCode::NOT_FOUND;
         message = "NOT_FOUND";
+    } else if let Some(e) = err.find::<UnsupportedMediaType>() {
+        code = StatusCode::UNSUPPORTED_MEDIA_TYPE;
+        error_message = e.to_string();
+        info!("Unsupported media type error: {}", error_message);
+        message = &error_message;
     } else if err.find::<ConversionError>().is_some()
         || err.find::<warp::reject::InvalidQuery>().is_some()
         || err.find::<warp::reject::InvalidHeader>().is_some()
@@ -46,8 +55,8 @@ pub async fn handle_rejection(err: warp::Rejection) -> Result<impl warp::Reply, 
         message = "Method Not Allowed";
     } else {
         // We should have expected this... Just log and say its a 500
-        eprintln!("unhandled rejection: {:?}", err);
         code = StatusCode::INTERNAL_SERVER_ERROR;
+        eprintln!("unhandled rejection: {:?}", err);
         message = "UNHANDLED_REJECTION";
     }
 
