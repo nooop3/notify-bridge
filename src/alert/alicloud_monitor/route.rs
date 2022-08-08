@@ -2,7 +2,12 @@ use reqwest::StatusCode;
 use warp::{filters::BoxedFilter, Filter, Rejection, Reply};
 
 use crate::{
-    alert::alicloud_monitor::message::AlertBody,
+    alert::alicloud_monitor::{
+        message::AlertBody,
+        transform::{
+            event_level_to_feishu_template_color, threshold_alert_state_to_feishu_template_color,
+        },
+    },
     common::{check_api_key, AlertDestinations, AlertKeyMap, NotifyResponseEnum, Response},
     error::FeishuFailedRequestError,
     notify::feishu::{
@@ -22,7 +27,12 @@ pub async fn handle_request(
     let mut results = Vec::new();
     for api_key in api_keys {
         if api_key.destination == AlertDestinations::Feishu {
-            // let template = alert_state_to_feishu_template_color(&body.state);
+            let template = match body {
+                AlertBody::Threshold(ref body) => {
+                    threshold_alert_state_to_feishu_template_color(&body.alert_state)
+                }
+                AlertBody::Event(ref body) => event_level_to_feishu_template_color(&body.level),
+            };
             // let message = body.message.clone().unwrap_or_else(|| "".to_string());
             // let eval_matches = body
             //     .eval_matches
@@ -39,11 +49,10 @@ pub async fn handle_request(
                 "".to_string(),
                 "".to_string(),
                 "".to_string(),
-                None,
                 // body.title.clone(),
                 // body.rule_url.clone().unwrap_or_else(|| "".to_string()),
                 // message,
-                // Some(template),
+                Some(template),
             )
             .await
             {
