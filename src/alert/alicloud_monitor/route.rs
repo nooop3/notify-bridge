@@ -33,6 +33,14 @@ pub async fn handle_request(
                 }
                 AlertBody::Event(ref body) => event_level_to_feishu_template_color(&body.level),
             };
+            let title = match body {
+                // $${serviceType}-$${metricName}-$${levelDescription} Alarm（$${dimensions}）
+                AlertBody::Threshold(ref body) => format!(
+                    "{}-{}-{} Alarm（{}）",
+                    body.metric_project, body.metric_name, body.trigger_level, body.dimensions
+                ),
+                AlertBody::Event(ref body) => body.name.to_string(),
+            };
             // let message = body.message.clone().unwrap_or_else(|| "".to_string());
             // let eval_matches = body
             //     .eval_matches
@@ -46,7 +54,7 @@ pub async fn handle_request(
             // );
             match feishu_post(
                 api_key.key,
-                "".to_string(),
+                title.clone(),
                 "".to_string(),
                 "".to_string(),
                 // body.title.clone(),

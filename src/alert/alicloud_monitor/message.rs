@@ -1,12 +1,34 @@
+use serde::Deserializer;
 use serde::{Deserialize, Serialize};
+use strum::{Display, EnumString};
 
 #[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[serde(rename_all = "UPPERCASE")]
 pub enum ThresholdAlertState {
-    #[serde(rename = "ok")]
     OK,
     Alert,
     InsufficientData,
+}
+
+#[derive(Display, Debug, Deserialize, Serialize, PartialEq, Eq, EnumString)]
+#[serde(rename_all = "UPPERCASE")]
+#[strum(serialize_all = "UPPERCASE")]
+pub enum ThresholdTriggerLevel {
+    Critical,
+    Warning,
+    Info,
+    #[serde(rename = "null")]
+    Unknown,
+}
+
+fn deserialize_percentage<'de, D>(deserializer: D) -> Result<String, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+    Ok(percent_encoding::percent_decode_str(&s)
+        .decode_utf8_lossy()
+        .to_string())
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -15,16 +37,19 @@ pub struct ThresholdAlertBody {
     pub alert_name: String,
     pub alert_state: ThresholdAlertState,
     pub cur_value: String,
+    #[serde(deserialize_with = "deserialize_percentage")]
     pub dimensions: String,
+    #[serde(deserialize_with = "deserialize_percentage")]
     pub expression: String,
     pub instance_name: String,
+    #[serde(deserialize_with = "deserialize_percentage")]
     pub metric_name: String,
     pub metric_project: String,
     pub namespace: String,
-    pub pre_trigger_level: String,
+    pub pre_trigger_level: ThresholdTriggerLevel,
     pub rule_id: String,
     pub timestamp: String,
-    pub trigger_level: String,
+    pub trigger_level: ThresholdTriggerLevel,
     pub user_id: String,
 }
 

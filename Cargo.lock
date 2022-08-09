@@ -587,6 +587,7 @@ dependencies = [
  "bytes",
  "log",
  "openssl",
+ "percent-encoding",
  "pretty_env_logger",
  "reqwest",
  "serde",
