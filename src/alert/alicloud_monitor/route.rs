@@ -15,6 +15,8 @@ use crate::{
     },
 };
 
+const ALI_CLOUD_MONITOR_HOST: &str = "https://cloudmonitornext.console.aliyun.com";
+
 pub async fn handle_request(
     api_keys: Vec<AlertKeyMap>,
     body: AlertBody,
@@ -41,6 +43,16 @@ pub async fn handle_request(
                 ),
                 AlertBody::Event(ref body) => body.name.to_string(),
             };
+
+            let mut url = format!("{}/newalarm-happen/type:product", ALI_CLOUD_MONITOR_HOST);
+            if let AlertBody::Threshold(ref body) = body {
+                if let Some(group_id) = &body.group_id {
+                    url = format!(
+                        "{}/app-group/{}/alarmRule?ruleName={}",
+                        ALI_CLOUD_MONITOR_HOST, group_id, body.alert_name
+                    );
+                }
+            }
             // let message = body.message.clone().unwrap_or_else(|| "".to_string());
             // let eval_matches = body
             //     .eval_matches
@@ -55,10 +67,8 @@ pub async fn handle_request(
             match feishu_post(
                 api_key.key,
                 title.clone(),
+                url,
                 "".to_string(),
-                "".to_string(),
-                // body.title.clone(),
-                // body.rule_url.clone().unwrap_or_else(|| "".to_string()),
                 // message,
                 Some(template),
             )
@@ -94,6 +104,7 @@ pub async fn handle_request(
 pub fn alert() -> BoxedFilter<(impl Reply,)> {
     warp::post()
         .and(warp::path!("api" / "v1" / "alicloud_monitor" / "alerts"))
+        .and(warp::body::content_length_limit(1024 * 1024 * 10))
         .and(check_api_key())
         .and(warp::body::form())
         .and_then(handle_request)

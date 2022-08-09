@@ -51,6 +51,7 @@ pub struct ThresholdAlertBody {
     pub timestamp: String,
     pub trigger_level: ThresholdTriggerLevel,
     pub user_id: String,
+    pub group_id: Option<String>,
 }
 
 // {
