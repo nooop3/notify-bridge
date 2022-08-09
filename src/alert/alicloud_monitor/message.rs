@@ -2,8 +2,9 @@ use serde::Deserializer;
 use serde::{Deserialize, Serialize};
 use strum::{Display, EnumString};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Display, Debug, Deserialize, Serialize, PartialEq, Eq, EnumString)]
 #[serde(rename_all = "UPPERCASE")]
+#[strum(serialize_all = "UPPERCASE")]
 pub enum ThresholdAlertState {
     OK,
     Alert,
@@ -44,6 +45,7 @@ pub struct ThresholdAlertBody {
     pub instance_name: String,
     #[serde(deserialize_with = "deserialize_percentage")]
     pub metric_name: String,
+    pub raw_metric_name: String,
     pub metric_project: String,
     pub namespace: String,
     pub pre_trigger_level: ThresholdTriggerLevel,
@@ -77,7 +79,8 @@ pub struct ThresholdAlertBody {
 //   "id": "103E55FC-7FC3-4B3D-AE12-C19EA84C****",
 //   "status": "Normal"
 // }
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Display, Debug, Deserialize, Serialize, PartialEq, Eq, EnumString)]
+#[strum(serialize_all = "PascalCase")]
 pub enum EventLevel {
     Critical,
     Warning,

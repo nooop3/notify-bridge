@@ -36,10 +36,13 @@ pub async fn handle_request(
                 AlertBody::Event(ref body) => event_level_to_feishu_template_color(&body.level),
             };
             let title = match body {
-                // $${serviceType}-$${metricName}-$${levelDescription} Alarm（$${dimensions}）
                 AlertBody::Threshold(ref body) => format!(
-                    "{}-{}-{} Alarm（{}）",
-                    body.metric_project, body.metric_name, body.trigger_level, body.dimensions
+                    "{} instance({}) {} {}（{}）",
+                    body.instance_name,
+                    body.alert_name,
+                    body.raw_metric_name,
+                    body.alert_state,
+                    body.cur_value,
                 ),
                 AlertBody::Event(ref body) => body.name.to_string(),
             };
@@ -53,27 +56,24 @@ pub async fn handle_request(
                     );
                 }
             }
-            // let message = body.message.clone().unwrap_or_else(|| "".to_string());
-            // let eval_matches = body
-            //     .eval_matches
-            //     .iter()
-            //     .map(|m| format!("- Matric: {}, Value: {}", m.metric, m.value))
-            //     .collect::<Vec<String>>()
-            //     .join("\n");
-            // let message = format!(
-            //     "**{}**\nMessage: {}\n{}\n- State: {}",
-            //     body.rule_name, message, eval_matches, body.state,
-            // );
-            match feishu_post(
-                api_key.key,
-                title.clone(),
-                url,
-                "".to_string(),
-                // message,
-                Some(template),
-            )
-            .await
-            {
+
+            let message = match body {
+                AlertBody::Threshold(ref body) => format!(
+                    "Instance: **{}**\nRule Id: {}\nRelated resource: {}\nStatus: **{}**\n{}: {}(**{}**)",
+                    body.instance_name,
+                    body.alert_name,
+                    body.dimensions,
+                    body.alert_state,
+                    body.raw_metric_name,
+                    body.expression,
+                    body.cur_value,
+                ),
+                AlertBody::Event(ref body) => format!(
+                    "**{}**\nInstance: {}\n- level: {}",
+                    body.product, body.instance_name, body.level,
+                ),
+            };
+            match feishu_post(api_key.key, title.clone(), url, message, Some(template)).await {
                 Ok((status, response)) => {
                     results.push(NotifyResponseEnum::Feishu(FeishuNotifyResponse {
                         destination: api_key.destination.to_string(),
