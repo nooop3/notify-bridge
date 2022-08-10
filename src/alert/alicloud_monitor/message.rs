@@ -16,8 +16,9 @@ pub enum ThresholdAlertState {
 #[strum(serialize_all = "UPPERCASE")]
 pub enum ThresholdTriggerLevel {
     Critical,
-    Warning,
+    Warn,
     Info,
+    OK,
     #[serde(rename = "null")]
     Unknown,
 }
