@@ -43,6 +43,7 @@ pub struct ThresholdAlertBody {
     pub dimensions: String,
     #[serde(deserialize_with = "deserialize_percentage")]
     pub expression: String,
+    #[serde(deserialize_with = "deserialize_percentage")]
     pub instance_name: String,
     #[serde(deserialize_with = "deserialize_percentage")]
     pub metric_name: String,
