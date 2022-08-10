@@ -2,7 +2,9 @@ use warp::{filters::BoxedFilter, hyper::StatusCode, Filter, Rejection, Reply};
 
 use crate::{
     alert::grafana::{message::AlertBody, transform::alert_state_to_feishu_template_color},
-    common::{check_api_key, AlertDestinations, AlertKeyMap, NotifyResponseEnum, Response},
+    common::{
+        check_api_key, log_json, AlertDestinations, AlertKeyMap, NotifyResponseEnum, Response,
+    },
     error::FeishuFailedRequestError,
     notify::feishu::{
         api_define::NotifyResponse as FeishuNotifyResponse, post::post as feishu_post,
@@ -73,8 +75,7 @@ pub fn alert() -> BoxedFilter<(impl Reply,)> {
     warp::post()
         .and(warp::path!("api" / "v1" / "grafana" / "alerts"))
         .and(check_api_key())
-        // .and(log_body())
-        .and(warp::body::json())
+        .and(log_json())
         .and_then(handle_request)
         .boxed()
 }
