@@ -6,7 +6,9 @@ use strum::{Display, EnumString};
 use warp::{Filter, Rejection};
 
 use crate::{
-    error::ConversionError, notify::feishu::api_define::NotifyResponse as FeishuNotifyResponse,
+    alert::alicloud_monitor::message::AlertBody,
+    error::{ConversionError, FormBodyDeserializeError},
+    notify::feishu::api_define::NotifyResponse as FeishuNotifyResponse,
 };
 
 #[derive(Display, Debug, PartialEq, Eq, EnumString)]
@@ -74,6 +76,36 @@ pub fn check_api_key() -> impl Filter<Extract = (Vec<AlertKeyMap>,), Error = Rej
             .collect()
     })
 }
+
+pub fn log_form() -> impl Filter<Extract = (AlertBody,), Error = Rejection> + Copy {
+    warp::body::bytes().and_then(|buf: bytes::Bytes| async move {
+        let body = std::str::from_utf8(&buf).unwrap();
+        info!("Received request form: {}", body);
+
+        serde_urlencoded::from_str::<AlertBody>(body).map_err(|err| {
+            warp::reject::custom(FormBodyDeserializeError {
+                message: err.to_string(),
+            })
+        })
+    })
+}
+
+// pub fn log<F>(func: F) -> warp::log::Log<F> {
+//     warp::log::custom(|info| {
+//         info!("method: {}, path: {}, status: {}", info.method(), info.path(), info.status());
+//     })
+// }
+
+// pub fn log_body() -> impl Filter<Extract = (), Error = Rejection> + Copy {
+//     warp::body::bytes()
+//         .map(move |b: Bytes| {
+//             info!(
+//                 "Request body: {}",
+//                 std::str::from_utf8(&b).expect("error converting bytes to &str")
+//             );
+//         })
+//         .untuple_one()
+// }
 
 // pub fn log_json<T: DeserializeOwned + Send>() -> impl Filter<Extract = (T,), Error = Rejection> + Copy {
 //     is_content_type::<Json>()

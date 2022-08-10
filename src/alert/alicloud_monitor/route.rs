@@ -8,7 +8,9 @@ use crate::{
             event_level_to_feishu_template_color, threshold_alert_state_to_feishu_template_color,
         },
     },
-    common::{check_api_key, AlertDestinations, AlertKeyMap, NotifyResponseEnum, Response},
+    common::{
+        check_api_key, log_form, AlertDestinations, AlertKeyMap, NotifyResponseEnum, Response,
+    },
     error::FeishuFailedRequestError,
     notify::feishu::{
         api_define::NotifyResponse as FeishuNotifyResponse, post::post as feishu_post,
@@ -21,11 +23,6 @@ pub async fn handle_request(
     api_keys: Vec<AlertKeyMap>,
     body: AlertBody,
 ) -> Result<impl Reply, Rejection> {
-    info!(
-        "Received Alicloud monitor alert: {}",
-        serde_json::to_string(&body).unwrap()
-    );
-
     let mut results = Vec::new();
     for api_key in api_keys {
         if api_key.destination == AlertDestinations::Feishu {
@@ -102,11 +99,24 @@ pub async fn handle_request(
 // POST /api/v1/alicloud_monitor/alerts?apiKey=<api-key>,<api-key>
 // apiKey format: "feishu_<API_KEY>,feishu_<API_KEY>"
 pub fn alert() -> BoxedFilter<(impl Reply,)> {
+    let log = warp::log::custom(|info| {
+        info!(
+            "method: {}, path: {}, status: {}",
+            info.method(),
+            info.path(),
+            info.status(),
+        );
+    });
+
     warp::post()
         .and(warp::path!("api" / "v1" / "alicloud_monitor" / "alerts"))
         .and(warp::body::content_length_limit(1024 * 1024 * 10))
         .and(check_api_key())
-        .and(warp::body::form())
+        // .and(log_body())
+        // .and(warp::body::form())
+        // .and(warp::body::bytes())
+        .and(log_form())
         .and_then(handle_request)
+        .with(log)
         .boxed()
 }

@@ -1,7 +1,7 @@
 use serde::Serialize;
 use serde_json::{json, Value};
+use warp::body::BodyDeserializeError;
 use warp::{
-    body::BodyDeserializeError,
     hyper::StatusCode,
     reject::{Reject, UnsupportedMediaType},
 };
@@ -22,6 +22,12 @@ pub struct FeishuFailedRequestError {
     pub message: String,
 }
 impl Reject for FeishuFailedRequestError {}
+
+#[derive(Debug)]
+pub struct FormBodyDeserializeError {
+    pub message: String,
+}
+impl Reject for FormBodyDeserializeError {}
 
 pub async fn handle_rejection(err: warp::Rejection) -> Result<impl warp::Reply, warp::Rejection> {
     let code;
@@ -45,8 +51,11 @@ pub async fn handle_rejection(err: warp::Rejection) -> Result<impl warp::Reply, 
     } else if let Some(e) = err.find::<BodyDeserializeError>() {
         code = StatusCode::BAD_REQUEST;
         error_message = e.to_string();
-        info!("Body deserializer error: {}", error_message);
+        warn!("Body deserializer error: {}", error_message);
         message = &error_message;
+    } else if let Some(e) = err.find::<FormBodyDeserializeError>() {
+        code = StatusCode::BAD_REQUEST;
+        message = &e.message;
     } else if let Some(e) = err.find::<FeishuFailedRequestError>() {
         code = StatusCode::BAD_REQUEST;
         message = &e.message;
