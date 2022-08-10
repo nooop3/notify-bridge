@@ -1,12 +1,11 @@
 use std::str::FromStr;
 use std::string::ToString;
 
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use strum::{Display, EnumString};
 use warp::{Filter, Rejection};
 
 use crate::{
-    alert::alicloud_monitor::message::AlertBody,
     error::{ConversionError, FormBodyDeserializeError},
     notify::feishu::api_define::NotifyResponse as FeishuNotifyResponse,
 };
@@ -77,12 +76,13 @@ pub fn check_api_key() -> impl Filter<Extract = (Vec<AlertKeyMap>,), Error = Rej
     })
 }
 
-pub fn log_form() -> impl Filter<Extract = (AlertBody,), Error = Rejection> + Copy {
+pub fn log_form<T: DeserializeOwned + Send>(
+) -> impl Filter<Extract = (T,), Error = Rejection> + Copy {
     warp::body::bytes().and_then(|buf: bytes::Bytes| async move {
         let body = std::str::from_utf8(&buf).unwrap();
         info!("Received request form: {}", body);
 
-        serde_urlencoded::from_str::<AlertBody>(body).map_err(|err| {
+        serde_urlencoded::from_str::<T>(body).map_err(|err| {
             warp::reject::custom(FormBodyDeserializeError {
                 message: err.to_string(),
             })
