@@ -33,14 +33,20 @@ pub async fn handle_request(
                 AlertBody::Event(ref body) => event_level_to_feishu_template_color(&body.level),
             };
             let title = match body {
-                AlertBody::Threshold(ref body) => format!(
-                    "{} instance({}) {} {}（{}）",
-                    body.instance_name,
-                    body.alert_name,
-                    body.raw_metric_name,
-                    body.alert_state,
-                    body.cur_value,
-                ),
+                AlertBody::Threshold(ref body) => {
+                    let instance_name = match body.instance_name == "null" {
+                        true => "Instance".to_string(),
+                        false => format!("{} instance", body.instance_name),
+                    };
+                    format!(
+                        "{}({}) {} {}（{}）",
+                        instance_name,
+                        body.alert_name,
+                        body.raw_metric_name,
+                        body.alert_state,
+                        body.cur_value,
+                    )
+                }
                 AlertBody::Event(ref body) => body.name.to_string(),
             };
 
